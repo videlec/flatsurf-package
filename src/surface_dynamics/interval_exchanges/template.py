@@ -315,13 +315,13 @@ class Permutation(SageObject):
 
             sage: p == iet.GeneralizedPermutation(p.str())
             True
-
         """
         l = self.list()
-        s0 =  ' '.join(map(str,l[0]))
-        s1 = ' '.join(map(str,l[1]))
-        return s0 + sep + s1
-
+        s = []
+        s.append(' '.join(map(str,l[0])))
+        s.append(' '.join(map(str,l[1])))
+        return sep.join(s)
+ 
     def __copy__(self) :
         r"""
         Returns a copy of self.
@@ -913,6 +913,62 @@ class Permutation(SageObject):
 
         return singularities
 
+    def cover(self, permutations, as_tuple=False):
+        r"""
+        EXAMPLES::
+
+            sage: from surface_dynamics.all import *
+            sage: p = iet.Permutation('a b', 'b a')
+            sage: p.cover(['(1,2)', '(1,3)'])
+            Covering of degree 3 of the permutation:
+            a b
+            b a
+
+            sage: p.cover([[1,0,2], [2,1,0]], as_tuple=True)
+            Covering of degree 3 of the permutation:
+            a b
+            b a
+        """
+        from cover import PermutationCover
+
+        if len(permutations) != len(self):
+            raise ValueError
+
+        if not as_tuple:
+            from sage.groups.perm_gps.permgroup_element import PermutationGroupElement
+            permutations = [PermutationGroupElement(p,check=True) for p in permutations]
+            permutations = [[i-1 for i in p.domain()] for p in permutations]
+
+            d = max(len(p) for p in permutations)
+
+            for p in permutations: p.extend(xrange(len(p),d))
+
+        else:
+            d = len(permutations[0])
+
+        return PermutationCover(self, d, permutations)
+
+    def orientation_cover(self):
+        r"""
+        EXAMPLES::
+
+            sage: from surface_dynamics.all import *
+            sage: p = iet.GeneralizedPermutation('a a b', 'b c c')
+            sage: c = p.orientation_cover()
+            sage: c
+            Covering of degree 2 of the permutation:
+            a a b
+            b c c
+            sage: c.stratum()
+            H_1(0^4)
+        """
+        rank = self.alphabet().rank
+        p0 = set(map(rank, self[0]))
+        p1 = set(map(rank, self[1]))
+        inv_letters = p0.symmetric_difference(p1)
+        permut_cover = [[1,0] if i in inv_letters else [0,1] for i in range(len(self.alphabet()))]
+        return self.cover(permut_cover, as_tuple=True)
+
 class PermutationIET(Permutation):
     def _init_twin(self, a):
         r"""
@@ -1344,6 +1400,7 @@ class PermutationIET(Permutation):
             return map(self._alphabet.unrank, sorted(self._labels[0]))
         else:
             return map(self._alphabet.unrank, range(len(self)))
+
 
 class PermutationLI(Permutation):
     def _init_twin(self, a):

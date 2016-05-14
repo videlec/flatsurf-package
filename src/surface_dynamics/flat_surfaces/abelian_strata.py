@@ -1006,6 +1006,11 @@ class AbelianStratumComponent(StratumComponent):
         p.alphabet(alphabet)
         return p
 
+    def lyapunov_exponents(self, **kargs):
+        perm = self.permutation_representative(reduced=False)
+        return(perm.lyapunov_exponents_H_plus(**kargs))
+
+
     def random_standard_permutation(self, nsteps=64):
         r"""
         Perform a random walk on rauzy diagram stopped on a standard permutation.
@@ -1652,6 +1657,9 @@ class AbelianStratumComponent(StratumComponent):
         if primitive:
             return [tcurve for tcurve in tcurves if tcurve.origami().is_primitive()]
         return tcurves
+
+    def lyapunov_exponents(self, **kargs):
+        return(self.permutation_representative(reduced=False).lyapunov_exponents_H_plus(**kargs))
 
 
 ASC = AbelianStratumComponent
