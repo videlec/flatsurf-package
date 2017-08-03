@@ -9,6 +9,8 @@ REFERENCES:
 .. [HuLe] Hubert Lelièvre
 .. [McMul] Mc Mullen
 """
+from six.moves import range
+
 from origami import Origami
 from sage.combinat.partition import Partitions,OrderedPartitions
 from sage.combinat.permutation import CyclicPermutationsOfPartition
@@ -50,7 +52,7 @@ def origami_H2_1cyl_iterator(n, reducible=False, output='coordinates'):
         l1,l2,l3 = l[0]
         if l1 == l2 and l2 == l3:
           if reducible or l1 == 1:
-            for t in xrange(l1):
+            for t in range(l1):
               if output == "coordinates":
                 yield l1,l2,l3,h,t
               elif output == "origami":
@@ -59,7 +61,7 @@ def origami_H2_1cyl_iterator(n, reducible=False, output='coordinates'):
                 yield origami_H2_1cyl(l1,l2,l3,h,t).standard_form()
 
         elif reducible or gcd([l1,l2,l3]) == 1:
-          for t in xrange(n):
+          for t in range(n):
             if output == "coordinates":
               yield l1,l2,l3,h,t
             elif output == "origami":
@@ -89,8 +91,8 @@ def origami_H2_2cyl_iterator(n, reducible=False, output="coordinates"):
             if reducible or gcd(h1,h2) == 1:
               d = gcd(w1,w2)
               if d == 1:
-                for t1 in xrange(w1):
-                  for t2 in xrange(w2):
+                for t1 in range(w1):
+                  for t2 in range(w2):
                     if output == "coordinates":
                       yield w1,h1,t1,w2,h2,t2
                     elif output == "origami":
@@ -99,8 +101,8 @@ def origami_H2_2cyl_iterator(n, reducible=False, output="coordinates"):
                       yield origami_H2_2cyl(w1,h1,t1,w2,h2,t2).standard_form()
 
               else:
-                for t1 in xrange(w1):
-                  for t2 in xrange(w2):
+                for t1 in range(w1):
+                  for t2 in range(w2):
                       if reducible or gcd(d,h2*t1-h1*t2) == 1:
                         if output == "coordinates":
                           yield w1,h1,t1,w2,h2,t2
@@ -156,16 +158,16 @@ def origami_H2_1cyl(l1,l2,l3,h,t):
     """
     l = l1 + l2 + l3
     z = (h-1)*l+1
-    x = [None] + range(2,h*l+2)
-    for i in xrange(0,h*l,l):
+    x = [None] + list(range(2,h*l+2))
+    for i in range(0,h*l,l):
         x[i+l] = i+1
 
-    y = [None] + range(l+1,l*h+1) + [None]*l
-    for i in xrange(l3):
+    y = [None] + list(range(l+1,l*h+1)) + [None]*l
+    for i in range(l3):
         y[z + (t+i)%l] = l1+l2+i+1
-    for i in xrange(l2):
+    for i in range(l2):
         y[z + (l3+t+i)%l] = l1+i+1
-    for i in xrange(l1):
+    for i in range(l1):
         y[z + (l3+l2+t+i)%l] = i+1
 
     return Origami(x[1:],y[1:])
@@ -189,7 +191,7 @@ def origami_H2_2cyl(w1,h1,t1,w2,h2,t2):
     z2 = v1 + (h2-1)*w2 + 1
 
     # the horizontal permutation
-    x = [None] + range(2,v1+v2+1) + [1]
+    x = [None] + list(range(2,v1+v2+1)) + [1]
     for i in range(h1):
         x[(i+1)*w1] = i*w1 + 1
     for i in range(h2):
@@ -197,8 +199,8 @@ def origami_H2_2cyl(w1,h1,t1,w2,h2,t2):
 
     # the vertical permutation
     y = ([None] +
-        range(w1+1,v1+1) + [None]*w1 +
-        range(v1+w2+1,v1+v2+1) + [None]*w2)
+        list(range(w1+1,v1+1)) + [None]*w1 +
+        list(range(v1+w2+1,v1+v2+1)) + [None]*w2)
 
     for i in range(w2):
         # up-left of the first cylinder
